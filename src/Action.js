@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import "./css/Action.css"
 
 const gcdOverrides = new Set([
@@ -56,46 +56,91 @@ const ogcdOverrides = new Set([
 
 const actionMap = new Map()
 
+
+function getIdFromJson(jsonData) {
+	if (jsonData && jsonData.fields && jsonData.fields.id) {
+		return jsonData.fields.id;
+	} else {
+		return null;
+	}
+}
+
+
+
+
 export default function Action({ actionId, additionalClasses }) {
-	const [apiData, setApiData] = React.useState()
+	const [apiData, setApiData] = useState(null); // For API data
+	const [encodedStr, setEncodedStr] = useState(null); // State for encodedStr
+	const [isLoading, setIsLoading] = useState(true); // Track loading state
 
-	React.useEffect(() => {
-		const mapData = actionMap.get(actionId)
-		if (mapData != null) {
-			setApiData(mapData)
-			return
-		}
+	// Function to fetch the Icon path from the API
+	async function fetchIconPath(url) {
+		try {
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				mode: 'cors', // Ensures CORS is used
+			});
 
-		let current = true
-		void (async () => {
-			const data = await (await fetch(`https://beta.xivapi.com/api/1/sheet/Action/${actionId}?fields=Icon,Name,ActionCategoryTargetID&limit=200`, {
-				mode: "cors"
-			})).json()
-			if (current) {
-				actionMap.set(actionId, data)
-				setApiData(data)
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
 			}
-		})()
 
-		return () => {
-			current = false
+			const data = await response.json();
+
+			// Extract the 'path' from the 'fields.Icon'
+			const iconPath = data.fields && data.fields.Icon && data.fields.Icon.path
+				? data.fields.Icon.path
+				: null;
+
+			return iconPath;
+		} catch (error) {
+			console.error('Error fetching data:', error);
+			return null;
 		}
-	}, [actionId])
+	}
 
-	if (apiData === undefined || !apiData.Icon) {
-		return null
+	useEffect(() => {
+		const apiUrl = `https://beta.xivapi.com/api/1/sheet/Action/${actionId}?fields=Icon,Name,ActionCategoryTargetID&limit=200`;
+
+		// Fetch the icon path and update the encodedStr state
+		fetchIconPath(apiUrl).then((iconPath) => {
+			if (iconPath) {
+				const encoded = iconPath.replace(/\//g, '%2F');
+				setEncodedStr(encoded); // Update the encodedStr state
+				setIsLoading(false); // Set loading to false once the data is fetched
+			}
+		});
+
+		// Clean up on component unmount or when actionId changes
+		return () => {
+			setEncodedStr(null); // Reset encodedStr when actionId changes
+			setIsLoading(true);  // Set loading to true when new fetch starts
+		};
+	}, [actionId]); // Fetch again if actionId changes
+
+	// If data is loading, display a placeholder or spinner
+	if (isLoading) {
+		return <div>Loading...</div>; // You can replace this with a spinner or placeholder image
+	}
+
+	// If there's an issue fetching the encodedStr
+	if (!encodedStr) {
+		return <div>Error loading icon</div>; // You can customize this error message
 	}
 
 	return (
 		<img
 			className={
 				gcdOverrides.has(actionId) ||
-				(!ogcdOverrides.has(actionId) && apiData.ActionCategoryTargetID !== 4)
+					(!ogcdOverrides.has(actionId) && apiData?.ActionCategoryTargetID !== 4)
 					? `gcd ${additionalClasses}`
 					: `ogcd ${additionalClasses}`
 			}
-			src={`https://xivapi.com/${apiData.Icon}`}
-			alt={apiData.Name || ""}
+			src={`https://beta.xivapi.com/api/1/asset?path=${encodedStr}&format=png`} // Use encodedStr here
+			alt={apiData?.Name || 'Action Icon'}
 		/>
-	)
+	);
 }

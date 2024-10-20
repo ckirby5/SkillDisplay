@@ -1,4 +1,6 @@
 import React from "react"
+import { Resizable } from 'react-resizable'
+import 'react-resizable/css/styles.css'
 import listenToACT from "./ACTListener"
 import "./css/App.css"
 import Action from "./Action"
@@ -10,6 +12,14 @@ const handleCodes = new Set(["00", "01", "02", "21", "22", "33"])
 export default function App() {
 	const [actionList, setActionList] = React.useState([])
 	const [encounterList, setEncounterList] = React.useState([])
+	const [width, setWidth] = React.useState(400);
+	const [height, setHeight] = React.useState(300);
+
+	const handleResize = (event, { element, size }) => {
+		setWidth(size.width);
+		setHeight(size.height);
+	};
+
 
 	React.useEffect(() => {
 		let selfId
@@ -126,25 +136,27 @@ export default function App() {
 
 	return (
 		<>
-			<div className="container">
-				<div className="actions">
-					{actionList.map(({ action, key }) => (
-						<Action
-							key={key}
-							actionId={action}
-							additionalClasses="action-move"
+			<Resizable width={width} height={height} onResize={handleResize}>
+				<div className="container">
+					<div className="actions">
+						{actionList.map(({ action, key }) => (
+							<Action
+								key={key}
+								actionId={action}
+								additionalClasses="action-move"
+							/>
+						))}
+					</div>
+					{encounterList.map((encounter, i) => (
+						<RotationContainer
+							key={i}
+							encounterId={i}
+							name={encounter.name}
+							actionList={encounter.rotation}
 						/>
 					))}
 				</div>
-				{encounterList.map((encounter, i) => (
-					<RotationContainer
-						key={i}
-						encounterId={i}
-						name={encounter.name}
-						actionList={encounter.rotation}
-					/>
-				))}
-			</div>
+			</Resizable>
 		</>
 	)
 }

@@ -1,14 +1,14 @@
 ## SkillDisplay
-A simple no-frills ACTWebSocket overlay for showing actions pressed in an overlay window.
+A fork of the original SkillDisplay ACT overlay found here: https://github.com/Rawrington/SkillDisplay.  The original overlay was not updated with xivapi's new routes.  I have attempted to fix the routes.
 
 ## Installation
 Make sure the 'Using BeforeLogLineRead' box is checked in ACTWebSocket then click the 'Add URL' button to add this URL:
-`https://rawrington.github.io/SkillDisplay/`
+`https://ckirby5.github.io/SkillDisplay/`
 
 ## Troubleshooting
-I have only tested and confirmed this working on the QT5.8.0 variant of OverlayProc with ACTWebSocket 1.3.3.9 so if you are having trouble please use these versions.
+This is probably very buggy and I cannot guarantee full functionality.  If anything is wrong, please reach out to me.
 
-If you find any strange bugs, please report to me on here or find me on the ACT FFXIV discord.
+If you find any strange bugs, please report to me on here or find me.
 
 ## Preview
 ![preview.png](./images/preview.png)
