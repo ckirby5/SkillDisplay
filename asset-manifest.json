@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/SkillDisplay/static/css/main.7aa7c60e.css",
-    "main.js": "/SkillDisplay/static/js/main.c145e939.js",
+    "main.js": "/SkillDisplay/static/js/main.c525d501.js",
     "index.html": "/SkillDisplay/index.html",
     "main.7aa7c60e.css.map": "/SkillDisplay/static/css/main.7aa7c60e.css.map",
-    "main.c145e939.js.map": "/SkillDisplay/static/js/main.c145e939.js.map"
+    "main.c525d501.js.map": "/SkillDisplay/static/js/main.c525d501.js.map"
   },
   "entrypoints": [
     "static/css/main.7aa7c60e.css",
-    "static/js/main.c145e939.js"
+    "static/js/main.c525d501.js"
   ]
 }
